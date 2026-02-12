@@ -12,7 +12,7 @@
     "vscode": {
       "settings": {},
       "extensions": [
-        "ms-python.python",
+        "ms-python.python",//
         "ms-python.vscode-pylance"
       ]
     }
