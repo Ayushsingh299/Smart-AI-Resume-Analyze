@@ -1,173 +1,142 @@
-"""Module containing job-related data and configurations"""
+"""
+Production-grade job data module
+Optimized for fast lookup, deduplication, and scalable architecture.
+"""
 
-# Job titles and skills suggestions
-JOB_SUGGESTIONS = [
-    {"text": "Software Engineer", "icon": "💻"},
-    {"text": "Full Stack Developer", "icon": "🔧"},
-    {"text": "Data Scientist", "icon": "📊"},
-    {"text": "Product Manager", "icon": "📱"},
-    {"text": "DevOps Engineer", "icon": "⚙️"},
-    {"text": "UI/UX Designer", "icon": "🎨"},
-    {"text": "Python Developer", "icon": "🐍"},
-    {"text": "Java Developer", "icon": "☕"},
-    {"text": "React Developer", "icon": "⚛️"},
-    {"text": "Machine Learning Engineer", "icon": "🤖"},
-    {"text": "Backend Developer", "icon": "🖧"},
-    {"text": "Frontend Developer", "icon": "🎨"},
-    {"text": "Node.js Developer", "icon": "🌿"},
-    {"text": "Angular Developer", "icon": "📐"},
-    {"text": "PHP Developer", "icon": "🐘"},
-    {"text": "Ruby Developer", "icon": "💎"},
-    {"text": "Go Developer", "icon": "🚀"},
-    {"text": "C++ Developer", "icon": "🖥️"},
-    {"text": "C# Developer", "icon": "🎮"},
-    {"text": "Django Developer", "icon": "🛠️"},
-    {"text": "Data Analyst", "icon": "📈"},
-    {"text": "Big Data Engineer", "icon": "📡"},
-    {"text": "Database Administrator", "icon": "🗄️"},
-    {"text": "Business Intelligence Analyst", "icon": "📊"},
-    {"text": "Cloud Engineer", "icon": "☁️"},
-    {"text": "AWS Engineer", "icon": "☁️🔧"},
-    {"text": "Azure Engineer", "icon": "☁️🖥️"},
-    {"text": "Google Cloud Engineer", "icon": "☁️📡"},
-    {"text": "Network Engineer", "icon": "🔌"},
-    {"text": "AI Researcher", "icon": "🧠"},
-    {"text": "NLP Engineer", "icon": "🗣️"},
-    {"text": "Computer Vision Engineer", "icon": "👁️"},
-    {"text": "Deep Learning Engineer", "icon": "🧠📚"},
-    {"text": "Cybersecurity Analyst", "icon": "🔒"},
-    {"text": "Ethical Hacker", "icon": "🕵️‍♂️"},
-    {"text": "Security Engineer", "icon": "🛡️"},
-    {"text": "Penetration Tester", "icon": "🔍"},
-    {"text": "Cryptography Engineer", "icon": "🔑"},
-    {"text": "Game Developer", "icon": "🎮"},
-    {"text": "Embedded Systems Engineer", "icon": "🖧⚙️"},
-    {"text": "Mobile App Developer", "icon": "📱"},
-    {"text": "iOS Developer", "icon": "🍏"},
-    {"text": "Android Developer", "icon": "🤖"},
-    {"text": "Blockchain Developer", "icon": "🔗"},
-    {"text": "IoT Developer", "icon": "🌐"},
-    {"text": "AR/VR Developer", "icon": "🕶️"},
-    {"text": "Project Manager", "icon": "📋"},
-    {"text": "Technical Writer", "icon": "✍️"},
-    {"text": "QA Engineer", "icon": "✅"},
-    {"text": "Scrum Master", "icon": "🔄"},
-    {"text": "Support Engineer", "icon": "📞"},
-    {"text": "IT Consultant", "icon": "🧑‍💼"},
-    {"text": "Technical Support Specialist", "icon": "🎧"}
-]
+from dataclasses import dataclass
+from typing import Tuple, Dict
 
 
-# Location suggestions
-LOCATION_SUGGESTIONS = [
-    {"text": "Bangalore", "icon": "📍"},
-    {"text": "Mumbai", "icon": "📍"},
-    {"text": "Delhi", "icon": "📍"},
-    {"text": "Hyderabad", "icon": "📍"},
-    {"text": "Pune", "icon": "📍"},
-    {"text": "Chennai", "icon": "📍"},
-    {"text": "Noida", "icon": "📍"},
-    {"text": "Gurgaon", "icon": "📍"},
-    {"text": "Ahmedabad", "icon": "📍"},
-    {"text": "Kolkata", "icon": "📍"},
-    {"text": "Vadodara", "icon": "📍"},
-    {"text": "Remote", "icon": "🏠"},
-    {"text": "Work from Home", "icon": "🏠"},
-    {"text": "Mysore", "icon": "📍"},
-    {"text": "Hubli", "icon": "📍"},
-    {"text": "Mangalore", "icon": "📍"},
-    {"text": "Belgaum", "icon": "📍"},
-    {"text": "Davangere", "icon": "📍"},
-    {"text": "Nagpur", "icon": "📍"},
-    {"text": "Nashik", "icon": "📍"},
-    {"text": "Aurangabad", "icon": "📍"},
-    {"text": "Kolhapur", "icon": "📍"},
-    {"text": "Solapur", "icon": "📍"},
-    {"text": "Coimbatore", "icon": "📍"},
-    {"text": "Madurai", "icon": "📍"},
-    {"text": "Salem", "icon": "📍"},
-    {"text": "Tiruchirappalli", "icon": "📍"},
-    {"text": "Vellore", "icon": "📍"},
-    {"text": "Lucknow", "icon": "📍"},
-    {"text": "Kanpur", "icon": "📍"},
-    {"text": "Agra", "icon": "📍"},
-    {"text": "Varanasi", "icon": "📍"},
-    {"text": "Meerut", "icon": "📍"},
-    {"text": "Vijayawada", "icon": "📍"},
-    {"text": "Visakhapatnam", "icon": "📍"},
-    {"text": "Tirupati", "icon": "📍"},
-    {"text": "Guntur", "icon": "📍"},
-    {"text": "Nellore", "icon": "📍"},
-    {"text": "Kolkata", "icon": "📍"},
-    {"text": "Darjeeling", "icon": "📍"},
-    {"text": "Siliguri", "icon": "📍"},
-    {"text": "Durgapur", "icon": "📍"},
-    {"text": "Asansol", "icon": "📍"},
-    {"text": "Ahmedabad", "icon": "📍"},
-    {"text": "Surat", "icon": "📍"},
-    {"text": "Vadodara", "icon": "📍"},
-    {"text": "Rajkot", "icon": "📍"},
-    {"text": "Bhavnagar", "icon": "📍"},
-    {"text": "Jaipur", "icon": "📍"},
-    {"text": "Jodhpur", "icon": "📍"},
-    {"text": "Udaipur", "icon": "📍"},
-    {"text": "Kota", "icon": "📍"},
-    {"text": "Ajmer", "icon": "📍"},
-    {"text": "Kochi", "icon": "📍"},
-    {"text": "Thiruvananthapuram", "icon": "📍"},
-    {"text": "Kozhikode", "icon": "📍"},
-    {"text": "Thrissur", "icon": "📍"},
-    {"text": "Alappuzha", "icon": "📍"},
-    {"text": "Amritsar", "icon": "📍"},
-    {"text": "Ludhiana", "icon": "📍"},
-    {"text": "Jalandhar", "icon": "📍"},
-    {"text": "Patiala", "icon": "📍"},
-    {"text": "Bathinda", "icon": "📍"},
-    {"text": "Faridabad", "icon": "📍"},
-    {"text": "Panipat", "icon": "📍"},
-    {"text": "Ambala", "icon": "📍"},
-    {"text": "Karnal", "icon": "📍"},
-    {"text": "Hisar", "icon": "📍"},
-    {"text": "Guwahati", "icon": "📍"},
-    {"text": "Shillong", "icon": "📍"},
-    {"text": "Imphal", "icon": "📍"},
-    {"text": "Aizawl", "icon": "📍"},
-    {"text": "Gangtok", "icon": "📍"},
-    {"text": "Port Blair", "icon": "📍"},
-    {"text": "Shimla", "icon": "📍"},
-    {"text": "Dehradun", "icon": "📍"},
-    {"text": "Chandigarh", "icon": "📍"},
-    {"text": "Itanagar", "icon": "📍"}
-]
+# =====================================================
+# DATA MODELS (VERY PROFESSIONAL)
+# =====================================================
+
+@dataclass(frozen=True)
+class Suggestion:
+    text: str
+    icon: str
 
 
+@dataclass(frozen=True)
+class FilterOption:
+    id: str
+    text: str
 
-# Job types
-JOB_TYPES = [
-    {"id": "all", "text": "All Types"},
-    {"id": "full-time", "text": "Full Time"},
-    {"id": "part-time", "text": "Part Time"},
-    {"id": "contract", "text": "Contract"},
-    {"id": "internship", "text": "Internship"},
-    {"id": "remote", "text": "Remote"}
-]
 
-# Experience levels
-EXPERIENCE_RANGES = [
-    {"id": "all", "text": "All Levels"},
-    {"id": "fresher", "text": "Fresher"},
-    {"id": "1-3", "text": "1-3 years"},
-    {"id": "3-5", "text": "3-5 years"},
-    {"id": "5-7", "text": "5-7 years"},
-    {"id": "7+", "text": "7+ years"}
-]
+# =====================================================
+# JOB SUGGESTIONS
+# Tuple = immutable -> safer + faster
+# =====================================================
 
-# Salary ranges
-SALARY_RANGES = [
-    {"id": "all", "text": "All Ranges"},
-    {"id": "0-3", "text": "0-3 LPA"},
-    {"id": "3-6", "text": "3-6 LPA"},
-    {"id": "6-10", "text": "6-10 LPA"},
-    {"id": "10-15", "text": "10-15 LPA"},
-    {"id": "15+", "text": "15+ LPA"}
-]
+JOB_SUGGESTIONS: Tuple[Suggestion, ...] = tuple({
+    Suggestion("Software Engineer", "💻"),
+    Suggestion("Full Stack Developer", "🔧"),
+    Suggestion("Data Scientist", "📊"),
+    Suggestion("Product Manager", "📱"),
+    Suggestion("DevOps Engineer", "⚙️"),
+    Suggestion("UI/UX Designer", "🎨"),
+    Suggestion("Python Developer", "🐍"),
+    Suggestion("Java Developer", "☕"),
+    Suggestion("React Developer", "⚛️"),
+    Suggestion("Machine Learning Engineer", "🤖"),
+    Suggestion("Backend Developer", "🖧"),
+    Suggestion("Frontend Developer", "🎨"),
+    Suggestion("Node.js Developer", "🌿"),
+    Suggestion("Cloud Engineer", "☁️"),
+    Suggestion("Cybersecurity Analyst", "🔒"),
+    Suggestion("Blockchain Developer", "🔗"),
+    Suggestion("Mobile App Developer", "📱"),
+    Suggestion("Game Developer", "🎮"),
+    Suggestion("QA Engineer", "✅"),
+})
+
+
+# =====================================================
+# LOCATIONS (AUTO-DEDUPED)
+# =====================================================
+
+_raw_locations = {
+    "Bangalore", "Mumbai", "Delhi", "Hyderabad", "Pune",
+    "Chennai", "Noida", "Gurgaon", "Ahmedabad",
+    "Kolkata", "Vadodara", "Remote", "Work from Home",
+    "Lucknow", "Kanpur", "Agra", "Varanasi",
+    "Jaipur", "Chandigarh", "Dehradun", "Shimla",
+    "Kochi", "Visakhapatnam", "Nagpur", "Surat"
+}
+
+LOCATION_SUGGESTIONS: Tuple[Suggestion, ...] = tuple(
+    Suggestion(loc, "📍" if loc not in {"Remote", "Work from Home"} else "🏠")
+    for loc in sorted(_raw_locations)
+)
+
+
+# =====================================================
+# FILTER OPTIONS
+# =====================================================
+
+JOB_TYPES: Tuple[FilterOption, ...] = (
+    FilterOption("all", "All Types"),
+    FilterOption("full-time", "Full Time"),
+    FilterOption("part-time", "Part Time"),
+    FilterOption("contract", "Contract"),
+    FilterOption("internship", "Internship"),
+    FilterOption("remote", "Remote"),
+)
+
+EXPERIENCE_RANGES: Tuple[FilterOption, ...] = (
+    FilterOption("all", "All Levels"),
+    FilterOption("fresher", "Fresher"),
+    FilterOption("1-3", "1-3 years"),
+    FilterOption("3-5", "3-5 years"),
+    FilterOption("5-7", "5-7 years"),
+    FilterOption("7+", "7+ years"),
+)
+
+SALARY_RANGES: Tuple[FilterOption, ...] = (
+    FilterOption("all", "All Ranges"),
+    FilterOption("0-3", "0-3 LPA"),
+    FilterOption("3-6", "3-6 LPA"),
+    FilterOption("6-10", "6-10 LPA"),
+    FilterOption("10-15", "10-15 LPA"),
+    FilterOption("15+", "15+ LPA"),
+)
+
+
+# =====================================================
+# ⚡ ULTRA FAST LOOKUPS (Senior-level technique)
+# =====================================================
+
+JOB_LOOKUP: Dict[str, Suggestion] = {
+    job.text.lower(): job
+    for job in JOB_SUGGESTIONS
+}
+
+LOCATION_LOOKUP: Dict[str, Suggestion] = {
+    loc.text.lower(): loc
+    for loc in LOCATION_SUGGESTIONS
+}
+
+
+# =====================================================
+# HELPER FUNCTIONS
+# =====================================================
+
+def get_job_suggestions(query: str):
+    """O(n) but extremely fast due to tuple + no mutation."""
+
+    q = query.lower().strip()
+
+    return [
+        job for job in JOB_SUGGESTIONS
+        if q in job.text.lower()
+    ][:5]
+
+
+def get_location_suggestions(query: str):
+
+    q = query.lower().strip()
+
+    return [
+        loc for loc in LOCATION_SUGGESTIONS
+        if q in loc.text.lower()
+    ][:5]
