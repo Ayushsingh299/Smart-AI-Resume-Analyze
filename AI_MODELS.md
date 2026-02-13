@@ -49,4 +49,4 @@ When using the AI analysis features:
 
 ## Future AI Integrations
 
-We plan to integrate additional AI models in the future to provide even more comprehensive resume analysis and feedback. Stay tuned for updates! 
+We plan to integrate additional AI models in the future to provide even more comprehensive resume analysis and feedback. Stay tuned for updates!.
