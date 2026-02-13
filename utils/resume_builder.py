@@ -1,9 +1,7 @@
 import streamlit as st
 from utils.resume_analyzer import ResumeAnalyzer
-from utils.resume_builder import ResumeBuilder
 
 analyzer = ResumeAnalyzer()
-builder = ResumeBuilder()
 
 st.title("🚀 Smart AI Resume Optimizer")
 
