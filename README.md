@@ -86,6 +86,9 @@ So your resume moves from “filtered out” to “shortlisted.”
 
 ---
 
+###  📁 Project Structure
+![WhatsApp Image 2026-02-13 at 13 59 27](https://github.com/user-attachments/assets/1eb279d8-39f2-4817-8acd-acfc377ad36e)
+
 ## <img src="https://github.com/user-attachments/assets/e5ac1371-6ac4-48b6-b95c-5ef9afaf1353" width="30"> **Live Demo**  
 👨‍💻 Try it Now: [![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://smart-ai-resume-analyzer.streamlit.app/)  
 
