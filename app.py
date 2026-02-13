@@ -1124,17 +1124,17 @@ class ResumeApp:
         </div>
         """, unsafe_allow_html=True)
         
-        # File Upload
+                # File Upload
         uploaded_file = st.file_uploader("Upload your resume", type=['pdf', 'docx'])
         
         st.markdown(
             self.render_empty_state(
-            "fas fa-cloud-upload-alt",
-            "Upload your resume to get started with AI-powered analysis"
+                "fas fa-cloud-upload-alt",
+                "Upload your resume to get started with AI-powered analysis"
             ),
             unsafe_allow_html=True
         )
-               if uploaded_file:
+        if uploaded_file:
             with st.spinner("Analyzing your document..."):
                 text = ""
                 try:
@@ -1147,6 +1147,7 @@ class ResumeApp:
                 except Exception as e:
                     st.error(f"Error reading file: {str(e)}")
                     return
+
 
 
                 
