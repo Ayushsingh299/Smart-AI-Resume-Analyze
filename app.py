@@ -14,7 +14,12 @@ import json
 import pandas as pd
 import plotly.express as px
 import traceback
-from utils.resume_analyzer import ResumeAnalyzer
+from utils.resume_analyzer import (
+    ResumeAnalyzer,
+    extract_text_from_pdf,
+    extract_text_from_docx,
+)
+
 from config.database import (
     get_database_connection, save_resume_data, save_analysis_data, 
     init_database, verify_admin, log_admin_action
@@ -1129,20 +1134,20 @@ class ResumeApp:
             ),
             unsafe_allow_html=True
         )
-        if uploaded_file:
+               if uploaded_file:
             with st.spinner("Analyzing your document..."):
-                # Get file content
                 text = ""
                 try:
                     if uploaded_file.type == "application/pdf":
-                        text = self.analyzer.extract_text_from_pdf(uploaded_file)
+                        text = extract_text_from_pdf(uploaded_file)
                     elif uploaded_file.type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-                        text = self.analyzer.extract_text_from_docx(uploaded_file)
+                        text = extract_text_from_docx(uploaded_file)
                     else:
                         text = uploaded_file.getvalue().decode()
                 except Exception as e:
                     st.error(f"Error reading file: {str(e)}")
                     return
+
 
                 
                 # Analyze the document
