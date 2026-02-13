@@ -126,21 +126,24 @@ class DashboardManager:
             ("This Month", start_of_month),
             ("All Time", datetime(2000, 1, 1)),
         ]:
-            cursor.execute(
-                """
-                SELECT 
-                    COUNT(DISTINCT rd.id) as total_resumes,
-                    ROUND(AVG(ra.ats_score), 1) as avg_ats_score,
-                    ROUND(AVG(ra.keyword_match_score), 1) as avg_keyword_score,
-                    COUNT(DISTINCT CASE WHEN ra.ats_score >= 70 THEN rd.id END) as high_scoring
-                FROM resume_data rd
-                LEFT JOIN resume_analysis ra ON rd.id = ra.resume_id
-                WHERE rd.created_at >= ?
-                """,
-                (start_date.strftime("%Y-%m-%d %H:%M:%S"),),
-            )
+            try:
+                cursor.execute(
+                    """
+                    SELECT 
+                        COUNT(DISTINCT rd.id) as total_resumes,
+                        ROUND(AVG(ra.ats_score), 1) as avg_ats_score,
+                        ROUND(AVG(ra.keyword_match_score), 1) as avg_keyword_score,
+                        COUNT(DISTINCT CASE WHEN ra.ats_score >= 70 THEN rd.id END) as high_scoring
+                    FROM resume_data rd
+                    LEFT JOIN resume_analysis ra ON rd.id = ra.resume_id
+                    WHERE rd.created_at >= ?
+                    """,
+                    (start_date.strftime("%Y-%m-%d %H:%M:%S"),),
+                )
+                row = cursor.fetchone()
+            except Exception:
+                row = None
 
-            row = cursor.fetchone()
             if row:
                 metrics[period] = {
                     "total": row[0] or 0,
@@ -187,7 +190,7 @@ class DashboardManager:
         return df
 
     def get_job_role_stats(self):
-        """Get job role statistics"""
+        """Get job role statistics (safe if schema/table missing)"""
         query = """
         SELECT 
             job_role,
@@ -198,7 +201,17 @@ class DashboardManager:
         GROUP BY job_role
         ORDER BY resume_count DESC
         """
-        df = pd.read_sql_query(query, self.conn)
+        try:
+            df = pd.read_sql_query(query, self.conn)
+        except Exception:
+            return pd.DataFrame(
+                columns=[
+                    "job_role",
+                    "resume_count",
+                    "avg_ats_score",
+                    "avg_keyword_score",
+                ]
+            )
 
         if df.empty:
             return pd.DataFrame(
@@ -231,7 +244,23 @@ class DashboardManager:
         ORDER BY rd.created_at DESC
         LIMIT ?
         """
-        df = pd.read_sql_query(query, self.conn, params=(limit,))
+        try:
+            df = pd.read_sql_query(query, self.conn, params=(limit,))
+        except Exception:
+            return pd.DataFrame(
+                columns=[
+                    "id",
+                    "candidate_name",
+                    "email",
+                    "phone",
+                    "job_role",
+                    "created_at",
+                    "ats_score",
+                    "keyword_match_score",
+                    "overall_score",
+                    "match_percentage",
+                ]
+            )
         return df
 
     def get_trend_data(self, days=30):
@@ -249,9 +278,22 @@ class DashboardManager:
         GROUP BY DATE(rd.created_at)
         ORDER BY date
         """
-        df = pd.read_sql_query(
-            query, self.conn, params=(start_date.strftime("%Y-%m-%d %H:%M:%S"),)
-        )
+        try:
+            df = pd.read_sql_query(
+                query,
+                self.conn,
+                params=(start_date.strftime("%Y-%m-%d %H:%M:%S"),),
+            )
+        except Exception:
+            return pd.DataFrame(
+                columns=[
+                    "date",
+                    "resumes_count",
+                    "avg_ats_score",
+                    "avg_keyword_score",
+                ]
+            )
+
         return df
 
     def render_summary_cards(self, metrics):
