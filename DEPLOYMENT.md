@@ -192,7 +192,7 @@ RUN chmod +x startup.sh setup_chromedriver.py
 # Expose port for Streamlit
 EXPOSE 8501
 
-# Run the startup script
+# Run the startup script//
 CMD ["python", "run_app.py"]
 ```
 

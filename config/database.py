@@ -11,7 +11,7 @@ def init_database():
     conn = get_database_connection()
     cursor = conn.cursor()
     
-    # Create resume_data table//
+    # Create resume_data table//.
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS resume_data (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
