@@ -88,36 +88,16 @@ So your resume moves from “filtered out” to “shortlisted.”
 
 ## <img src="https://github.com/user-attachments/assets/e5ac1371-6ac4-48b6-b95c-5ef9afaf1353" width="30"> **Live Demo**  
 👨‍💻 Try it Now: [![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://smart-ai-resume-analyzer.streamlit.app/)  
-## OR 
-https://smart-ai-resume-analyzegit-gvvsqhhd8h8wthcdpyx3ft.streamlit.app/  
-
-📄 **AI Documentation:** `AI_MODELS.md`  
-🤝 **Contributions:** Pull Requests Welcome  
-
-
 
 ---
 
 ## 🔗 Helpful Links
 
-- **Live App:** https://smart-ai-resume-analyzegit-gvvsqhhd8h8wthcdpyx3ft.streamlit.app/  
-- **AI Models & Approach:** `AI_MODELS.md`  
+- **Live App:** https://smart-ai-resume-analyzegit-gvvsqhhd8h8wthcdpyx3ft.streamlit.app/    
 - **Issue Tracker:** https://github.com/Ayushsingh299/Smart-AI-Resume-Analyzer/issues  
 - **Pull Requests:** https://github.com/Ayushsingh299/Smart-AI-Resume-Analyzer/pulls  
 
 ---
-
-## 🔗 **Helpful Links**
-
-- [![Streamlit Badge](https://img.shields.io/badge/Live%20Demo-Streamlit-orange?style=for-the-badge&logo=streamlit&logoColor=white)](https://smart-ai-resume-analyzegit-gvvsqhhd8h8wthcdpyx3ft.streamlit.app/)  
-
-- [![Documentation Badge](https://img.shields.io/badge/Documentation-Request-blue?style=for-the-badge&logo=gmail&logoColor=white)](ayush2043singh@gmail.com?subject=Request%20Documentation%20for%20Smart%20AI%20Resume%20Analyzer&body=Hi%20Het%20Patel,%0D%0AI%20am%20interested%20in%20learning%20more%20about%20your%20project,%20Smart%20AI%20Resume%20Analyzer.%20Here%20are%20my%20details:%0D%0A%0D%0AName:%0D%0AOrganization/College:%0D%0APurpose%20of%20request:%0D%0A%0D%0AThanks!)  
-
-- [![AI Models Badge](https://img.shields.io/badge/AI%20Models-Documentation-purple?style=for-the-badge&logo=openai&logoColor=white)](AI_MODELS.md)  
-
-- [![Contribution Guide Badge](https://img.shields.io/badge/Contribution%20Guide-Read%20Here-brightgreen?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Ayushsingh299/Smart-AI-Resume-Analyzer/blob/main/.github/CONTRIBUTING.md)   
-
-- [![Support Badge](https://img.shields.io/badge/Support%20%26%20Feedback-Discussion-ff69b4?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Ayushsingh299/Smart-AI-Resume-Analyzer/discussions)  
   
 ## <img src="https://github.com/user-attachments/assets/a6e4d77f-56d6-4aa8-8278-0f5a18ef5eb9" width="24px"> **What Makes Us Different?**  
 
