@@ -1,169 +1,171 @@
 import streamlit as st
-import sqlite3
-import os
-import logging
-import pandas as pd
+from datetime import datetime
+from config.database import get_database_connection
 
-# ==============================
-# CONFIGURATION
-# ==============================
-
-st.set_page_config(
-    page_title="Smart Resume AI - Feedback System",
-    page_icon="⭐",
-    layout="wide"
-)
-
-logging.basicConfig(
-    filename="app.log",
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s"
-)
-
-# ==============================
-# FEEDBACK MANAGER
-# ==============================
 
 class FeedbackManager:
     def __init__(self):
-        self.db_path = "feedback/feedback.db"
-        os.makedirs("feedback", exist_ok=True)
-        self.setup_database()
+        self.conn = get_database_connection()
+        self._ensure_table()
 
-    def get_connection(self):
-        return sqlite3.connect(self.db_path, check_same_thread=False)
+    def _ensure_table(self):
+        cursor = self.conn.cursor()
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS feedback (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                rating INTEGER NOT NULL CHECK(rating BETWEEN 1 AND 5),
+                usability_score INTEGER NOT NULL CHECK(usability_score BETWEEN 1 AND 5),
+                feature_satisfaction INTEGER NOT NULL CHECK(feature_satisfaction BETWEEN 1 AND 5),
+                missing_features TEXT,
+                improvement_suggestions TEXT,
+                user_experience TEXT,
+                timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+            """
+        )
+        cursor.execute(
+            "CREATE INDEX IF NOT EXISTS idx_rating ON feedback(rating);"
+        )
+        self.conn.commit()
 
-    # ✅ NOW LOADING schema.sql
-    def setup_database(self):
-        try:
-            with self.get_connection() as conn:
-                with open("schema.sql", "r") as f:
-                    conn.executescript(f.read())
+    def render_feedback_form(self):
+        st.header("📣 Your Voice Matters!")
+        st.write("Help us improve Smart Resume AI with your valuable feedback.")
 
-            logging.info("Database initialized using schema.sql")
+        with st.form("feedback_form"):
+            st.subheader("Overall Experience")
+            rating = st.slider("Overall rating", 1, 5, 5)
 
-        except Exception as e:
-            logging.error(f"Schema load error: {e}")
+            st.subheader("Product Experience")
+            usability_score = st.slider("Ease of use", 1, 5, 4)
+            feature_satisfaction = st.slider("Feature satisfaction", 1, 5, 4)
 
-    def save_feedback(self, data):
-        try:
-            with self.get_connection() as conn:
-                conn.execute("""
-                    INSERT INTO feedback (
-                        rating, usability_score, feature_satisfaction,
-                        missing_features, improvement_suggestions,
-                        user_experience
-                    ) VALUES (?, ?, ?, ?, ?, ?)
-                """, (
-                    data['rating'],
-                    data['usability_score'],
-                    data['feature_satisfaction'],
-                    data['missing_features'],
-                    data['improvement_suggestions'],
-                    data['user_experience']
-                ))
+            st.subheader("Tell us more")
+            missing_features = st.text_area(
+                "What features are missing?",
+                placeholder="E.g., more templates, export formats, job suggestions...",
+            )
+            improvement_suggestions = st.text_area(
+                "How can we improve?",
+                placeholder="Share any ideas or suggestions...",
+            )
+            user_experience = st.text_area(
+                "Describe your experience",
+                placeholder="What did you like or dislike?",
+            )
 
-            logging.info("Feedback saved successfully")
+            submitted = st.form_submit_button("Share Feedback")
+            if submitted:
+                self.save_feedback(
+                    rating,
+                    usability_score,
+                    feature_satisfaction,
+                    missing_features,
+                    improvement_suggestions,
+                    user_experience,
+                )
+                st.success("Thank you for your feedback! ✅")
 
-        except Exception as e:
-            logging.error(f"Save error: {e}")
-            raise e
+    def save_feedback(
+        self,
+        rating,
+        usability_score,
+        feature_satisfaction,
+        missing_features,
+        improvement_suggestions,
+        user_experience,
+    ):
+        cursor = self.conn.cursor()
+        cursor.execute(
+            """
+            INSERT INTO feedback (
+                rating,
+                usability_score,
+                feature_satisfaction,
+                missing_features,
+                improvement_suggestions,
+                user_experience,
+                timestamp
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                rating,
+                usability_score,
+                feature_satisfaction,
+                missing_features,
+                improvement_suggestions,
+                user_experience,
+                datetime.now().isoformat(),
+            ),
+        )
+        self.conn.commit()
 
-    @st.cache_data
-    def get_feedback_dataframe(self):
-        with self.get_connection() as conn:
-            return pd.read_sql_query("SELECT * FROM feedback", conn)
+    def render_feedback_stats(self):
+        cursor = self.conn.cursor()
+        cursor.execute(
+            """
+            SELECT 
+                COUNT(*) as total,
+                AVG(rating) as avg_rating,
+                AVG(usability_score) as avg_usability,
+                AVG(feature_satisfaction) as avg_features
+            FROM feedback
+            """
+        )
+        row = cursor.fetchone()
 
+        total = row[0] or 0
+        avg_rating = round(row[1], 1) if row[1] is not None else 0
+        avg_usability = round(row[2], 1) if row[2] is not None else 0
+        avg_features = round(row[3], 1) if row[3] is not None else 0
 
-# ==============================
-# UI
-# ==============================
+        st.subheader("Feedback Overview")
+        c1, c2, c3, c4 = st.columns(4)
+        with c1:
+            st.metric("Total Feedback", total)
+        with c2:
+            st.metric("Overall Rating", avg_rating)
+        with c3:
+            st.metric("Usability", avg_usability)
+        with c4:
+            st.metric("Features", avg_features)
 
-def render_feedback_form(manager):
-    st.title("📝 Share Your Feedback")
+        cursor.execute(
+            """
+            SELECT rating, usability_score, feature_satisfaction,
+                   missing_features, improvement_suggestions, user_experience, timestamp
+            FROM feedback
+            ORDER BY timestamp DESC
+            LIMIT 20
+            """
+        )
+        rows = cursor.fetchall()
 
-    col1, col2, col3 = st.columns(3)
+        if not rows:
+            st.info("No feedback submitted yet.")
+            return
 
-    rating = col1.slider("Overall Rating", 1, 5, 5)
-    usability = col2.slider("Usability Score", 1, 5, 5)
-    satisfaction = col3.slider("Feature Satisfaction", 1, 5, 5)
-
-    missing_features = st.text_area("Missing Features")
-    improvement = st.text_area("Improvement Suggestions")
-    experience = st.text_area("User Experience")
-
-    if st.button("Submit Feedback"):
-
-        feedback_data = {
-            "rating": rating,
-            "usability_score": usability,
-            "feature_satisfaction": satisfaction,
-            "missing_features": missing_features,
-            "improvement_suggestions": improvement,
-            "user_experience": experience
-        }
-
-        try:
-            with st.spinner("Saving feedback securely..."):
-                manager.save_feedback(feedback_data)
-
-            st.success("Feedback submitted successfully!")
-            st.balloons()
-
-        except Exception:
-            st.error("Error saving feedback.")
-
-
-def render_dashboard(manager):
-    st.header("📊 Feedback Analytics Dashboard")
-
-    df = manager.get_feedback_dataframe()
-
-    if df.empty:
-        st.info("No feedback data available yet.")
-        return
-
-    col1, col2, col3, col4 = st.columns(4)
-
-    col1.metric("Total Responses", len(df))
-    col2.metric("Average Rating", round(df['rating'].mean(), 2))
-    col3.metric("Usability Score", round(df['usability_score'].mean(), 2))
-    col4.metric("Feature Satisfaction", round(df['feature_satisfaction'].mean(), 2))
-
-    st.divider()
-
-    st.subheader("Rating Distribution")
-    st.bar_chart(df['rating'].value_counts().sort_index())
-
-    st.subheader("Usability Distribution")
-    st.bar_chart(df['usability_score'].value_counts().sort_index())
-
-    st.subheader("Satisfaction Distribution")
-    st.bar_chart(df['feature_satisfaction'].value_counts().sort_index())
-
-    # ✅ ADMIN MODE (Your edited version improved)
-    if st.sidebar.checkbox("Admin Mode"):
-        st.dataframe(df)
-
-        csv = df.to_csv(index=False).encode('utf-8')
-        st.download_button("Download CSV", csv, "feedback_data.csv", "text/csv")
-
-
-# ==============================
-# MAIN
-# ==============================
-
-def main():
-    manager = FeedbackManager()
-
-    st.sidebar.title("Navigation")
-    page = st.sidebar.radio("Go to", ["Feedback Form", "Dashboard"])
-
-    if page == "Feedback Form":
-        render_feedback_form(manager)
-    else:
-        render_dashboard(manager)
-
-
-if __name__ == "__main__":
-    main()
+        st.markdown("### Recent Feedback")
+        for (
+            rating,
+            usability_score,
+            feature_satisfaction,
+            missing_features,
+            improvement_suggestions,
+            user_experience,
+            ts,
+        ) in rows:
+            st.markdown("---")
+            st.markdown(f"**Rating:** ⭐ {rating}")
+            st.markdown(
+                f"Usability: {usability_score}/5 · Features: {feature_satisfaction}/5"
+            )
+            st.markdown(f"_Submitted at: {ts}_")
+            if user_experience:
+                st.markdown(f"**Experience:** {user_experience}")
+            if missing_features:
+                st.markdown(f"**Missing features:** {missing_features}")
+            if improvement_suggestions:
+                st.markdown(f"**Suggestions:** {improvement_suggestions}")
