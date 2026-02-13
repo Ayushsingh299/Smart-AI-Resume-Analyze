@@ -9,7 +9,7 @@
 
 > 💡 **Smart AI Resume Analyzer** is an advanced AI-powered platform designed to analyze, optimize, and enhance resumes using Natural Language Processing and Machine Learning — helping candidates significantly improve their chances of getting shortlisted.
 
-🌐 **Live Demo:** https://smart-ai-resume-analyzer.streamlit.app/
+🌐 **Live Demo:** https://smart-ai-resume-analyzegit-gvvsqhhd8h8wthcdpyx3ft.streamlit.app/
 📄 **AI Documentation:** AI_MODELS.md
 🤝 **Contributions:** Pull Requests Welcome
 
