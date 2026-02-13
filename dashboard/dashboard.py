@@ -159,7 +159,7 @@ class DashboardManager:
         return metrics
 
     def get_keyword_stats(self):
-        """Get keyword-level statistics"""
+        """Get keyword-level statistics (safe even if table is missing)"""
         query = """
         SELECT 
             rk.keyword,
@@ -172,7 +172,12 @@ class DashboardManager:
         ORDER BY resume_count DESC, avg_match_score DESC
         LIMIT 20
         """
-        df = pd.read_sql_query(query, self.conn)
+        try:
+            df = pd.read_sql_query(query, self.conn)
+        except Exception:
+            return pd.DataFrame(
+                columns=["keyword", "resume_count", "avg_match_score"]
+            )
 
         if df.empty:
             return pd.DataFrame(

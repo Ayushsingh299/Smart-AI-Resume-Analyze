@@ -1030,9 +1030,7 @@ class ResumeApp:
                     </a>
                 </div>
                 <p class="bio-text">
-                    Motivated B.Tech Computer Science student passionate about software development, AI, and data-driven technologies. Creator of **Smart Resume AI**, a platform designed to help job seekers build stronger, job-ready resumes through intelligent insights. Focused on continuous learning, innovation, and growing into a skilled software engineer.
-
-                </p>
+                    Driven B.Tech Computer Science student passionate about software development, AI, and data-driven technologies. Creator of **Smart Resume AI**, a platform designed to help job seekers build stronger, job-ready resumes through intelligent insights. Focused on continuous learning, innovation, and growing into a skilled software engineer</p>
             </div>
         """, unsafe_allow_html=True)
         
