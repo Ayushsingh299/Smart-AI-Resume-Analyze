@@ -496,11 +496,12 @@ class ResumeApp:
             </div>
         """
 
-              def analyze_resume(self, resume_text):
+                  def analyze_resume(self, resume_text):
         """Analyze resume and store results"""
         analytics = self.analyzer.analyze_resume(resume_text)
         st.session_state.analytics_data = analytics
         return analytics
+
 
     def handle_resume_upload(self):
         """Handle resume upload and analysis"""
