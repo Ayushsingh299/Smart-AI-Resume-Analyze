@@ -496,7 +496,7 @@ class ResumeApp:
             </div>
         """
 
-        def analyze_resume(self, resume_text):
+              def analyze_resume(self, resume_text):
         """Analyze resume and store results"""
         analytics = self.analyzer.analyze_resume(resume_text)
         st.session_state.analytics_data = analytics
@@ -504,8 +504,8 @@ class ResumeApp:
 
     def handle_resume_upload(self):
         """Handle resume upload and analysis"""
-        uploaded_file = st.file_uploader("Upload your resume", type=['pdf', 'docx'])
-        
+        uploaded_file = st.file_uploader("Upload your resume", type=["pdf", "docx"])
+
         if uploaded_file is not None:
             try:
                 # Extract text from resume
@@ -516,19 +516,20 @@ class ResumeApp:
 
                 # Store resume data
                 st.session_state.resume_data = {
-                    'filename': uploaded_file.name,
-                    'content': resume_text,
-                    'upload_time': datetime.now().isoformat()
+                    "filename": uploaded_file.name,
+                    "content": resume_text,
+                    "upload_time": datetime.now().isoformat(),
                 }
-                
+
                 # Analyze resume
                 analytics = self.analyze_resume(resume_text)
-                
+
                 return True
             except Exception as e:
                 st.error(f"Error processing resume: {str(e)}")
                 return False
         return False
+
 
 
     def render_builder(self):
