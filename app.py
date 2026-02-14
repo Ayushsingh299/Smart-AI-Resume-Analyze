@@ -14,7 +14,7 @@ import json
 import pandas as pd
 import plotly.express as px
 import traceback
-from utils.resume_analyzer import ResumeAnalyzer
+from utils.resumeanalyzer import ResumeAnalyzer, extracttextfrompdf, extracttextfromdocx
 from config.database import (
     get_database_connection, save_resume_data, save_analysis_data, 
     init_database, verify_admin, log_admin_action
@@ -502,18 +502,22 @@ class ResumeApp:
         st.session_state.analytics_data = analytics
         return analytics
 
-    def handle_resume_upload(self):
-        """Handle resume upload and analysis"""
-        uploaded_file = st.file_uploader("Upload your resume", type=['pdf', 'docx'])
-        
-        if uploaded_file is not None:
-            try:
-                # Extract text from resume
-                if uploaded_file.type == "application/pdf":
-                    resume_text = extract_text_from_pdf(uploaded_file)
-                else:
-                    resume_text = extract_text_from_docx(uploaded_file)
-                
+   def handle_resume_upload(self):
+    """Handle resume upload and analysis"""
+    uploaded_file = st.file_uploader("Upload your resume", type=['pdf', 'docx'])
+    
+    if uploaded_file is not None:
+        try:
+            # Extract text from resume
+            if uploaded_file.type == "application/pdf":
+                resume_text = extracttextfrompdf(uploaded_file)
+            else:
+                resume_text = extracttextfromdocx(uploaded_file)
+            # ... then use resume_text for analysis ...
+        except Exception as e:
+            st.error(f"Error reading file: {e}")
+            return
+
                 # Store resume data
                 st.session_state.resume_data = {
                     'filename': uploaded_file.name,
