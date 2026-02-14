@@ -1,3 +1,4 @@
+
 # Course recommendations organized by job categories
 COURSES_BY_CATEGORY = {
     "Software Development and Engineering": {
@@ -133,7 +134,7 @@ COURSES_BY_CATEGORY = {
     }
 }
 
-# Helper videos for resume and interview preparation //
+# Helper videos for resume and interview preparation
 RESUME_VIDEOS = {
     "Resume Writing": [
         ["Resume Writing Masterclass [Free]", "https://youtu.be/Tt08KmFfIYQ"],

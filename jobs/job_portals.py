@@ -1,183 +1,162 @@
+"""Module for handling job portal integrations"""
 import urllib.parse
-import logging
-from typing import Dict, List, Optional, Tuple
-from dataclasses import dataclass
-
-logging.basicConfig(level=logging.INFO)
-
-# =====================================================
-# DATA MODEL (VERY PROFESSIONAL)
-# =====================================================
-
-@dataclass(frozen=True)
-class Portal:
-    name: str
-    icon: str
-    color: str
-    url: str
-
-
-# =====================================================
-# JOB PORTAL ENGINE
-# =====================================================
+from typing import Dict, List
 
 class JobPortal:
-    """Production-ready job portal integration engine."""
-
+    """Class to handle job portal integrations and searches"""
+    
     def __init__(self):
-
-        # Immutable portals -> prevents accidental modification
-        self.portals: Tuple[Portal, ...] = (
-
-            Portal(
-                "LinkedIn",
-                "fab fa-linkedin",
-                "#0077b5",
-                "https://www.linkedin.com/jobs/search/?keywords={}&location={}&f_E={}"
-            ),
-
-            Portal(
-                "Indeed",
-                "fas fa-search-dollar",
-                "#2164f3",
-                "https://www.indeed.com/jobs?q={}&l={}&explvl={}"
-            ),
-
-            Portal(
-                "Naukri",
-                "fas fa-briefcase",
-                "#4a90e2",
-                "https://www.naukri.com/{}-jobs-in-{}?experience={}"
-            ),
-
-            Portal(
-                "Foundit",
-                "fas fa-globe",
-                "#ff6b6b",
-                'https://www.foundit.in/srp/results?query="{}"&locations={}&experienceRanges={}~{}&experience={}'
-            ),
-
-            Portal(
-                "Instahyre",
-                "fas fa-user-tie",
-                "#00bfa5",
-                "https://www.instahyre.com/{}-jobs-in-{}"
-            ),
-
-            Portal(
-                "Freshersworld",
-                "fas fa-graduation-cap",
-                "#28a745",
-                "https://www.freshersworld.com/jobs/jobsearch/{}-jobs-in-{}"
-            ),
-        )
-
-    # =====================================================
-    # FORMATTERS
-    # =====================================================
-
-    @staticmethod
-    def encode(text: str) -> str:
-        """Safe URL encoding."""
-        return urllib.parse.quote_plus(text.strip())
-
-    @staticmethod
-    def slug(text: str) -> str:
-        """Convert to URL slug."""
-        return text.strip().lower().replace(" ", "-")
-
-    def parse_experience(self, experience: Optional[Dict]) -> Tuple[str, str, str]:
-        """
-        Returns:
-        (exp_level, exp_min, exp_max)
-        """
-
-        if not experience:
-            return "", "0", "0"
-
-        exp_id = experience.get("id", "all")
-
-        mapping = {
-            "0-1": ("0", "0", "1"),
-            "1-3": ("1", "1", "3"),
-            "3-5": ("2", "3", "5"),
-            "5-7": ("3", "5", "7"),
-            "7-10": ("4", "7", "10"),
-            "10+": ("5", "10", "15"),
+        """Initialize job portal connections"""
+        self.headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
         }
+        self.portals = [
+            {
+                "name": "LinkedIn",
+                "icon": "fab fa-linkedin",
+                "color": "#0077b5",
+                "url": "https://www.linkedin.com/jobs/search/?keywords={}&location={}&f_E={}"
+            },
+            {
+                "name": "Indeed",
+                "icon": "fas fa-search-dollar",
+                "color": "#2164f3",
+                "url": "https://www.indeed.com/jobs?q={}&l={}&explvl={}"
+            },
+            {
+                "name": "Naukri",
+                "icon": "fas fa-briefcase",
+                "color": "#4a90e2",
+                "url": "https://www.naukri.com/{}-jobs-in-{}?experience={}"
+            },
+            {
+                "name": "Foundit",
+                "icon": "fas fa-globe",
+                "color": "#ff6b6b",
+                "url": "https://www.foundit.in/srp/results?query=\"{}\"&locations={}&experienceRanges={}~{}&experience={}"
+            },
+            {
+                "name": "Instahyre",
+                "icon": "fas fa-user-tie",
+                "color": "#00bfa5",
+                "url": "https://www.instahyre.com/{}-jobs-in-{}"
+            },
+            {
+                "name": "Freshersworld",
+                "icon": "fas fa-graduation-cap",
+                "color": "#28a745",
+                "url": "https://www.freshersworld.com/jobs/jobsearch/{}-jobs-in-{}"
+            }
+        ]
 
-        return mapping.get(exp_id, ("", "0", "0"))
+    def get_portal_list(self) -> List[Dict]:
+        """Get list of available job portals"""
+        return self.portals
 
-    # =====================================================
-    # CORE SEARCH ENGINE
-    # =====================================================
+    def format_query(self, query: str) -> str:
+        """Format query string for URLs"""
+        # Replace spaces with appropriate characters based on portal
+        return query.replace(" ", "+")
 
-    def search_jobs(
-        self,
-        query: str,
-        location: str = "",
-        experience: Optional[Dict] = None
-    ) -> List[Dict]:
-        """Generate job search URLs across portals."""
+    def format_location(self, location: str) -> str:
+        """Format location string for URLs"""
+        # Convert to lowercase and replace spaces with hyphens
+        return location.strip().lower().replace(" ", "-")
 
-        encoded_query = self.encode(query)
-        encoded_location = self.encode(location) if location else ""
-        slug_title = self.slug(query)
-        slug_location = self.slug(location) if location else ""
+    def format_job_title(self, title: str) -> str:
+        """Format job title for URLs"""
+        # Remove common words and special characters
+        title = title.lower()
+        title = title.replace("developer", "").replace("engineer", "").strip()
+        title = title.replace(" ", "-")
+        return title.strip("-")
 
-        exp_level, exp_min, exp_max = self.parse_experience(experience)
+    def format_experience(self, experience: str) -> tuple:
+        """Format experience for different job portals"""
+        if not experience or experience == "all":
+            return "", "0", "0", "entry"
+        
+        try:
+            # Handle dictionary input
+            if isinstance(experience, dict):
+                exp_id = experience.get('id', 'all')
+                if exp_id == 'all':
+                    return "", "0", "0", "entry"
+                
+                # Split experience range (e.g., "1-3" -> ["1", "3"])
+                exp_min, exp_max = exp_id.split('-')
+                if exp_max == "+":
+                    exp_max = "15"  # Set a reasonable maximum for 10+ years
+                
+                # Map to portal-specific format
+                exp_level = {
+                    "0-1": "0",
+                    "1-3": "1",
+                    "3-5": "2",
+                    "5-7": "3",
+                    "7-10": "4",
+                    "10+": "5"
+                }.get(exp_id, "0")
+                
+                return exp_level, exp_min, exp_max, "entry" if exp_min == "0" else "experienced"
+            
+            return "", "0", "0", "entry"
+            
+        except Exception as e:
+            print(f"Error formatting experience: {str(e)}")
+            return "", "0", "0", "entry"
 
+    def search_jobs(self, query: str, location: str = "", experience: dict = None) -> list:
+        """Search for jobs across all portals with formatted URLs"""
         results = []
-
+        formatted_query = self.format_query(query)
+        formatted_location = self.format_location(location) if location else ""
+        job_title = self.format_job_title(query)
+        
+        # Handle experience
+        if experience and isinstance(experience, dict):
+            exp_id = experience.get('id', 'all')
+            exp_text = experience.get('text', 'All Levels')
+            exp_level, exp_min, exp_max, exp_type = self.format_experience(exp_id)
+        else:
+            exp_level, exp_min, exp_max, exp_type = "", "0", "0", "entry"
+        
         for portal in self.portals:
             try:
-
-                if portal.name == "Foundit":
-                    url = portal.url.format(
-                        encoded_query,
-                        encoded_location,
-                        exp_min,
-                        exp_max,
-                        exp_min
+                if portal["name"] == "Foundit":
+                    url = portal["url"].format(
+                        formatted_query,
+                        formatted_location,
+                        exp_min, exp_max, exp_min
                     )
-
-                elif portal.name in ["Instahyre", "Freshersworld"]:
-                    url = portal.url.format(
-                        slug_title,
-                        slug_location
+                elif portal["name"] == "Instahyre":
+                    url = portal["url"].format(
+                        job_title,  # Use simplified job title
+                        formatted_location
                     )
-
-                elif portal.name in ["LinkedIn", "Indeed", "Naukri"]:
-                    url = portal.url.format(
-                        encoded_query,
-                        encoded_location,
+                elif portal["name"] == "Freshersworld":
+                    url = portal["url"].format(
+                        job_title,  # Use simplified job title
+                        formatted_location
+                    )
+                elif portal["name"] in ["LinkedIn", "Indeed", "Naukri"]:
+                    url = portal["url"].format(
+                        formatted_query,
+                        formatted_location,
                         exp_level
                     )
-
                 else:
-                    url = portal.url.format(
-                        encoded_query,
-                        encoded_location
-                    )
-
+                    url = portal["url"].format(formatted_query, formatted_location)
+                
                 results.append({
-                    "portal": portal.name,
-                    "icon": portal.icon,
-                    "color": portal.color,
-                    "title": f"{portal.name} • {query} jobs"
-                             + (f" in {location}" if location else ""),
+                    "portal": portal["name"],
+                    "icon": portal["icon"],
+                    "color": portal["color"],
+                    "title": f"Search {query} jobs in {location}" if location else f"Search {query} jobs",
                     "url": url
                 })
-
             except Exception as e:
-                logging.error(f"{portal.name} URL generation failed: {e}")
-
+                print(f"Error generating URL for {portal['name']}: {str(e)}")
+                continue
+        
         return results
-
-    # =====================================================
-    # HELPER
-    # =====================================================
-
-    def get_portals(self) -> Tuple[Portal, ...]:
-        """Return immutable portal list."""
-        return self.portals

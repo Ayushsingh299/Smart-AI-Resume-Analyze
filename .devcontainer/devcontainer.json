@@ -1,3 +1,4 @@
+
 {
   "name": "Python 3",
   // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
@@ -12,7 +13,7 @@
     "vscode": {
       "settings": {},
       "extensions": [
-        "ms-python.python",//
+        "ms-python.python",
         "ms-python.vscode-pylance"
       ]
     }
