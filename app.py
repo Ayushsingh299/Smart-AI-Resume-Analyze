@@ -496,16 +496,12 @@ class ResumeApp:
             </div>
         """
 
-    def analyze_resume(self, resume_text):
+        def analyze_resume(self, resume_text):
         """Analyze resume and store results"""
         analytics = self.analyzer.analyze_resume(resume_text)
         st.session_state.analytics_data = analytics
         return analytics
 
-   class ResumeApp:
-    def __init__(self):
-        ...
-    
     def handle_resume_upload(self):
         """Handle resume upload and analysis"""
         uploaded_file = st.file_uploader("Upload your resume", type=['pdf', 'docx'])
@@ -517,10 +513,6 @@ class ResumeApp:
                     resume_text = extracttextfrompdf(uploaded_file)
                 else:
                     resume_text = extracttextfromdocx(uploaded_file)
-                # use resume_text...
-            except Exception as e:
-                st.error(f"Error reading file: {e}")
-                return
 
                 # Store resume data
                 st.session_state.resume_data = {
@@ -537,6 +529,7 @@ class ResumeApp:
                 st.error(f"Error processing resume: {str(e)}")
                 return False
         return False
+
 
     def render_builder(self):
         st.title("Resume Builder 📝")
