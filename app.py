@@ -15,7 +15,6 @@ import pandas as pd
 import plotly.express as px
 import traceback
 from utils.resume_analyzer import ResumeAnalyzer
-from utils.resume_builder import ResumeBuilder
 from config.database import (
     get_database_connection, save_resume_data, save_analysis_data, 
     init_database, verify_admin, log_admin_action
@@ -88,7 +87,7 @@ class ResumeApp:
         self.dashboard_manager = DashboardManager()
         
         self.analyzer = ResumeAnalyzer()
-        self.builder = ResumeBuilder()
+        #self.builder = ResumeBuilder()
         self.job_roles = JOB_ROLES
         
         # Initialize session state
